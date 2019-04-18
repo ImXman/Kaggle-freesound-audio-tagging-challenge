@@ -2,7 +2,9 @@
 """
 Created on Tue Apr 16 12:41:19 2019
 
-@author: xuyan
+https://storage.googleapis.com/pub-tools-public-publication-data/pdf/45857.pdf
+
+https://github.com/tensorflow/models/tree/master/research/audioset
 """
 
 import os
