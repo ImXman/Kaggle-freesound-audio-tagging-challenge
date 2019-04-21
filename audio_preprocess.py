@@ -82,32 +82,16 @@ def ProcessWithVGGish(vgg, x, sr):
 
 vgg = CreateVGGishNetwork(0.01)
 
-#num_secs = 3
-#freq = 1000
-#sr = 44100
-#t = np.linspace(0, num_secs, int(num_secs * sr))
-#x = np.sin(2 * np.pi * freq * t)
-
-#wav_data, sr = sf.read("audio_train/0a6dbf2c.wav", dtype='int16')
-#maxs=float(max(abs(np.max(wav_data)),abs(np.min(wav_data))))
-#assert wav_data.dtype == np.int16, 'Bad sample type: %r' % wav_data.dtype
-#samples = wav_data / maxs  # Convert to [-1.0, +1.0]
-
 audio=os.listdir("audio_train/")
 for i in range(len(audio)):
     f="audio_train/"+audio[i]
     wav_data, sr = sf.read(f, dtype='int16')
+    ##audio less than 5 seconds not included
     if len(wav_data)<=60000:
         continue
     else:
-    #maxs=float(max(abs(np.max(wav_data)),abs(np.min(wav_data))))
-    #assert wav_data.dtype == np.int16, 'Bad sample type: %r' % wav_data.dtype
-    #samples = wav_data / maxs  # Convert to [-1.0, +1.0]
         samples = wav_data / 32768.0
-        #if len(samples)>132300:
-        #    samples= signal.resample(samples,132300)
-    
-    
+        ##audio longer thann 10s were cut into the first 10s
         postprocessed_batch = ProcessWithVGGish(vgg, samples[:132300], sr)
         out= "Downloads/freesound-audio-tagging/audio_train/embedding/" +audio[i][:-4]
         np.savetxt(out,postprocessed_batch,delimiter="\t")
