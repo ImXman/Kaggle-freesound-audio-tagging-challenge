@@ -1,1 +1,6 @@
-
+Original data source:
+https://www.kaggle.com/c/freesound-audio-tagging/data
+Postprocessed data (embedded into 128 spaces):
+audio_embedding.csv
+Data label:
+train.csv
