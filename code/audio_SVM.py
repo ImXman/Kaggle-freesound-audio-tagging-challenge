@@ -18,7 +18,7 @@ dataAll = data_T.join(labels, how="left")
 X = data_T.values
 Y, uniques = pd.factorize(dataAll["label"])
 #%% Search for the best model parameter
-tuned_parameters = [{'kernel': ['linear'], 'C': [0.0001, 0.001, 0.10, 0.1, 1]}]
+tuned_parameters = [{'kernel': ['linear'], 'C': [0.0001, 0.001, 0.01, 0.1, 1]}]
 clf = GridSearchCV(SVC(), tuned_parameters, n_jobs=4)
 clf.fit(X=X, y=Y)
 test_score, std = clf.cv_results_['mean_test_score'], clf.cv_results_['std_test_score']
@@ -37,9 +37,10 @@ best_k = acc[acc.index(max(acc))][1]
 predictions = cross_val_predict(SVC_model, X, Y, cv=best_k)
 #%% Plot results
 plt.figure()
-plt.errorbar([0.0001, 0.001, 0.10, 0.1, 1], test_score, yerr=std,fmt='o', label = 'linear')
+plt.bar([0.0001, 0.001, 0.01, 0.1, 1], test_score, yerr=std, label = 'linear')
 plt.legend()
 plt.title("SVM linear accuracy with differnt penalty parameter C")
+plt.xticks([0.0001, 0.001, 0.01, 0.1, 1], ('0.0001', '0.001', '0.01', '0.1', '1'))
 plt.figure()
 plt.plot(zip(*acc)[1], zip(*acc)[0])
 plt.title('Accuracy of k-fold cross validation')
