@@ -37,15 +37,18 @@ best_k = acc[acc.index(max(acc))][1]
 predictions = cross_val_predict(SVC_model, X, Y, cv=best_k)
 #%% Plot results
 plt.figure()
-plt.bar([0.0001, 0.001, 0.01, 0.1, 1], test_score, yerr=std, label = 'linear')
-plt.legend()
+plt.bar(range(5), test_score, width = 0.4, yerr=std)
 plt.title("SVM linear accuracy with differnt penalty parameter C")
-plt.xticks([0.0001, 0.001, 0.01, 0.1, 1], ('0.0001', '0.001', '0.01', '0.1', '1'))
+plt.xticks(range(5), ('0.0001', '0.001', '0.01', '0.1', '1'))
 plt.figure()
 plt.plot(zip(*acc)[1], zip(*acc)[0])
 plt.title('Accuracy of k-fold cross validation')
-plt.ylim()
+plt.ylim(0.5,0.65)
 plt.xlabel("Number of k")
 #%%
 from sklearn.metrics import confusion_matrix
 fused_matrix = confusion_matrix(Y,predictions)
+
+"""
+reference: https://www.kaggle.com/udaysa/svm-with-scikit-learn-svm-with-parameter-tuning
+"""
