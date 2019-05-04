@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import GridSearchCV
-import numpy as np
+import seaborn as sns; sns.set()  # for plot styling
 #import performance
 from sklearn.decomposition import PCA as PCA
 import matplotlib.pyplot as plt
@@ -21,7 +21,7 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
 from sklearn import metrics
-from DrawingTools import plot_confusion_matrix
+#from DrawingTools import plot_confusion_matrix
 
 #%% Import data from .csv file
 features = pd.read_csv('../data/audio_embedding_10s.csv', index_col=0)
@@ -29,8 +29,14 @@ labels = pd.read_csv('../data/train.csv', index_col=0)
 labels.index=labels.index.str.replace('.wav', '', regex=True) # remove audio file postfix
 ## merge training data with labels
 data = (features.transpose()).join(labels, how="left")
-X = features.transpose().values
-y, uniques = pd.factorize(data["label"])
+# Train data sample index of manually verified ones
+verified_idx = np.array(data[data["manually_verified"] == 1].index)
+#get the verified data
+data_veri = data.loc[verified_idx]
+data_verif = data_veri.drop(columns=['manually_verified'])
+
+X = data_verif.drop(columns=['label']).values
+y, uniques = pd.factorize(data_verif["label"])
 
 # X after PCA dimensionality reduction
 PCAobject = PCA().fit(X)
@@ -49,7 +55,8 @@ param_grid ={
                     'batch_size': ['auto'],
                     'learning_rate_init': [0.001],
                     'max_iter' : [2000], #maximum iterations
-                    'hidden_layer_sizes': [ (5,),(10,),(20,),(5,5),(10,10), (50,50)]
+                    'hidden_layer_sizes': [ (5,),(10,),(20,),(5,5),(10,10), (50,50), 
+                                           (20,20,20),(50,50,50),(20,20,20,20)]
                 }
 # obtain best model after fine tuning with 10-fold cross validation
 model = GridSearchCV(MLPClassifier(), param_grid, cv=10,n_jobs=-1,scoring='accuracy')
@@ -61,7 +68,7 @@ confusion_matrix = get_confusion_matrix(predicted_labels,y_test)
 print('best model accuracy:',accuracy)
 print('best model confusion matrix:',confusion_matrix)
 ##----------Plot confusion matrix---------------------
-#classes = np.unique(y)
+classes = np.unique(y)
 #plot_confusion_matrix(confusion_matrix, classes,
 #                          normalize=False,
 #                          title='Confusion matrix',
@@ -69,17 +76,21 @@ print('best model confusion matrix:',confusion_matrix)
 #                          save_path='../data/',
 #                          filename='CMBPNN.png',
 #                          show_plots=True)
-
-
+fig = plt.figure(figsize=(11, 9), dpi=100)
+sns.heatmap(confusion_matrix.T, square=True, annot=True, cbar=False,cmap="BuPu",
+            xticklabels=classes,
+            yticklabels=classes)
+plt.xlabel('true label')
+plt.ylabel('predicted label');
 
 
 # best parameter is
-# {'activation': 'identity', 'alpha': 0.0001, 'batch_size': 'auto', 'hidden_layer_sizes': (20,),
+# {'activation': 'identity', 'alpha': 0.0001, 'batch_size': 'auto', 'hidden_layer_sizes': (20,20,20,20),
 # 'learning_rate_init': 0.001, 'max_iter': 2000}
 #%%
 """ when set as optimal parameter, then plot the "accuracy over epochs" figure
     optimal hidden layer number is 20."""
-mlp = MLPClassifier(hidden_layer_sizes=(20,), max_iter=2000, alpha=1e-4,
+mlp = MLPClassifier(hidden_layer_sizes=(20,20,20,20), max_iter=2000, alpha=1e-4,
                     solver='adam', verbose=0, tol=1e-8, random_state=1,
                     learning_rate_init=.001)
 
@@ -124,10 +135,3 @@ ax[1].plot(scores_test)
 ax[1].set_title('Test')
 fig.suptitle("Accuracy over epochs", fontsize=14)
 plt.show()
-
-
-
-
-
-
-
