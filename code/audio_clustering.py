@@ -158,9 +158,10 @@ sns.barplot(x="Category", y="Accuaracy", data=som_preds)
 
 ##-----------------------------------------------------------------------------
 ##mean shift
-from sklearn.cluster import MeanShift
+from sklearn.cluster import MeanShift#,estimate_bandwidth
 
-ms = MeanShift(bandwidth=0.01, bin_seeding=True)
+#bandwidth = estimate_bandwidth(x_tr, quantile=0.2, n_samples=500)
+ms = MeanShift(cluster_all=False, bin_seeding=False)
 ms.fit(x_tr)
 
 ms_pred = ms.predict(x_te)
